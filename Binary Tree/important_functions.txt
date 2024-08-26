@@ -1,0 +1,668 @@
+// To calculate diameter of binary tree
+
+// Approach 1
+int height(struct Node* node)
+{
+    if(!node)
+        return 0;
+        
+    int leftheight = height(node->left);
+    int rightheight = height(node->right);
+    
+    if(leftheight > rightheight)
+        return leftheight + 1;
+    else
+        return rightheight + 1;
+    
+}
+// Function to return the diameter of a Binary Tree.
+int diameter(struct Node* root) {
+    if(!root)
+        return 0;
+    
+    int op1 = diameter(root -> left);
+    int op2 = diameter(root -> right);
+    int op3 = height(root->left) + height(root->right) + 1;
+    
+    int ans = max(op1, max(op2, op3));
+    
+    return ans;
+}
+
+// Approach 2
+int diameter(struct Node* root) {
+    return diameterFast(root).first;
+}
+pair<int, int> diameterFast(struct Node* root)
+{
+    if(!root)
+    {
+        pair<int, int> p = make_pair(0,0);
+        return p;
+    }
+    
+    pair<int, int> left = diameterFast(root -> left);
+    pair<int, int> right = diameterFast(root -> right);
+    
+    int op1 = left.first;
+    int op2 = right.first;
+    int op3 = left.second + right.second + 1;
+    
+    pair<int, int> ans;
+    ans.first = max(op1, max(op2, op3));
+    ans.second = max(left.second, right.second) + 1;
+    
+    return ans;
+}
+
+// check is the tree is balanced
+
+class Solution{
+    pair<bool, int> isBalancedFast(Node* root)
+    {
+        if(!root)
+        {
+            pair<bool, int> p = make_pair(true, 0);
+            return p;
+        }
+        
+        pair<bool, int> left = isBalancedFast(root->left);
+        pair<bool, int> right = isBalancedFast(root->right);
+        
+        pair<bool ,int> ans;
+        ans.second = max(left.second, right.second) + 1;
+            
+        bool diff = abs(left.second - right.second) <= 1;
+        
+        if(left.first && right.first && diff)
+            ans.first = true;
+        else 
+            ans.first = false;
+        
+        return ans;
+    }
+    public:
+    //Function to check whether a binary tree is balanced or not.
+    bool isBalanced(Node *root)
+    {
+        return isBalancedFast(root).first;
+    }
+};
+
+// Trees are identical or not
+
+    bool isIdentical(Node *r1, Node *r2)
+    {
+        if(!r1 && !r2)
+            return true;
+        
+        if(!r1 && r2)
+            return false;
+        if(r1 && !r2)
+            return false;
+            
+        if(r1->data == r2->data)
+        {
+            isIdentical(r1->left, r2->left);
+            isIdentical(r1->right, r2->right);
+        }else
+            return false;
+    }
+
+// Sum Tree
+
+    pair<bool, int> isSumTreeFast(Node* root)
+    {
+        if(!root)
+        {
+            pair<bool, int> p = make_pair(true, 0);
+            return p;
+        }
+        
+        if(!root->left && !root->right)
+        {
+            pair<bool, int> p = make_pair(true, root->data);
+            return p;
+        }
+        
+        pair<bool, int> left = isSumTreeFast(root->left);
+        pair<bool, int> right = isSumTreeFast(root->right);
+        
+        pair<bool, int> ans;
+        
+        bool leftAns = left.first;
+        bool rightAns = right.first;
+        bool cond = root->data == left.second + right.second;
+        
+        if(leftAns && rightAns && cond)
+        {
+            ans.first = true;
+            ans.second = 2*root->data;
+        }
+        else
+            ans.first = false;
+            
+        return ans;
+    }
+    bool isSumTree(Node* root)
+    {
+        return isSumTreeFast(root).first;
+    }
+
+// Zig Zag traversal
+
+    vector <int> zigZagTraversal(Node* root)
+    {
+    	vector<int> result;
+    	
+    	if(!root)
+    	    return result;
+    	    
+    	bool lefttoright = true;
+    	
+    	queue<Node*> q;
+    	q.push(root);
+    	
+    	while(!q.empty())
+    	{
+    	    int size = q.size();
+    	    vector<int> ans(size);
+    	    
+    	    for(int i=0; i<size; i++)
+    	    {
+    	        Node* frontnode = q.front();
+    	        q.pop();
+    	        
+    	        int index = lefttoright ? i : size - i - 1;
+    	        
+    	        ans[index] = frontnode -> data;
+    	        
+    	        if(frontnode -> left)
+    	            q.push(frontnode -> left);
+    	            
+    	        if(frontnode -> right)
+    	            q.push(frontnode -> right);
+    	    }
+    	    lefttoright = !lefttoright;
+    	    
+    	    for(auto i : ans)
+    	        result.push_back(i);
+    	}
+    	return result;
+    }
+
+// Boundary traversal
+
+    void traverseleft(Node* root, vector<int> &ans)
+    {
+        if(!root || (!root->left && !root->right))
+            return;
+        
+        ans.push_back(root->data);
+        
+        if(root->left)
+            traverseleft(root->left, ans);
+        else if(root->right)
+            traverseleft(root->right, ans);
+    }
+    
+    void traverseleaf(Node* root, vector<int> &ans)
+    {
+        if(!root)
+            return;
+        
+        if(!root->left && !root->right)
+            ans.push_back(root->data);
+        
+        traverseleaf(root->left, ans);
+        traverseleaf(root->right, ans);
+    }
+    
+    void traverseright(Node* root, vector<int> &ans)
+    {
+        if(!root || (!root->left && !root->right))
+            return;
+        
+        if(root->right)
+            traverseright(root->right, ans);
+        else if(root->left)
+            traverseright(root->left, ans);
+            
+        ans.push_back(root->data);
+    }
+    vector <int> boundary(Node *root)
+    {
+        vector<int> ans;
+        if(!root)
+            return ans;
+            
+        ans.push_back(root->data);
+        
+        traverseleft(root -> left, ans);
+        
+        traverseleaf(root->left, ans);
+        traverseleaf(root->right, ans);
+        
+        traverseright(root->right, ans);
+        
+        return ans;
+    }
+
+// Function to find the vertical order traversal of Binary Tree.
+
+    vector<int> verticalOrder(Node *root)
+    {
+        map<int, map<int, vector<int>>> nodes;
+        queue<pair<Node*, pair<int, int>>> q;
+        vector<int> ans;
+        
+        if(!root)
+            return ans;
+            
+        q.push(make_pair(root, make_pair(0, 0)));
+        while(!q.empty())
+        {
+            pair<Node*, pair<int, int>> temp = q.front();
+            q.pop();
+            
+            Node* frontnode = temp.first;
+            int hd = temp.second.first;
+            int lvl = temp.second.second;
+            
+            nodes[hd][lvl].push_back(frontnode->data);
+            
+            if(frontnode->left)
+                q.push(make_pair(frontnode->left, make_pair(hd-1, lvl+1)));
+            if(frontnode->right)
+                q.push(make_pair(frontnode->right, make_pair(hd+1, lvl+1)));
+        }
+        
+        for(auto i : nodes)
+            for(auto j : i.second)
+                for(auto k : j.second)
+                    ans.push_back(k);
+        
+        return ans;
+    }
+
+// Function to return a list of nodes visible from the top view 
+// from left to right in Binary Tree.
+
+    vector<int> topView(Node *root)
+    {
+        vector<int> ans;
+        map<int, int> topnode;
+        queue<pair<Node*, int>> q;
+        
+        if(!root)
+            return ans;
+        
+        q.push(make_pair(root, 0));
+        while(!q.empty())
+        {
+            pair<Node*, int> temp = q.front();
+            Node* frontnode = temp.first;
+            q.pop();
+            
+            int hd = temp.second;
+            if(topnode.find(hd) == topnode.end())
+                topnode[hd] = frontnode->data;
+            
+            if(frontnode->left)
+                q.push(make_pair(frontnode->left, hd-1));
+            if(frontnode->right)
+                q.push(make_pair(frontnode->right, hd+1));
+        }
+        for(auto i : topnode)
+            ans.push_back(i.second);
+        
+        return ans;
+    }
+
+// bottom view
+
+    vector <int> bottomView(Node *root) {
+        vector<int> ans;
+        map<int, int> topnode;
+        queue<pair<Node*, int>> q;
+        
+        if(!root)
+            return ans;
+        
+        q.push(make_pair(root, 0));
+        while(!q.empty())
+        {
+            pair<Node*, int> temp = q.front();
+            Node* frontnode = temp.first;
+            q.pop();
+            
+            int hd = temp.second;
+            topnode[hd] = frontnode->data;
+            
+            if(frontnode->left)
+                q.push(make_pair(frontnode->left, hd-1));
+            if(frontnode->right)
+                q.push(make_pair(frontnode->right, hd+1));
+        }
+        for(auto i : topnode)
+            ans.push_back(i.second);
+        
+        return ans;
+    }
+
+//Function to return a list containing elements of left view of the binary tree.
+void solve(Node* root, vector<int> &ans, int level)
+{
+    if(!root)
+        return;
+    
+    if(level == ans.size())
+        ans.push_back(root->data);
+    
+    solve(root->left, ans, level+1);
+    solve(root->right, ans, level+1);
+}
+vector<int> leftView(Node *root)
+{
+    vector<int> ans;
+    solve(root, ans, 0);
+    return ans;
+}
+
+// Function to return list containing elements of right view of binary tree.
+    void solve(Node* root, vector<int> &ans, int level)
+    {
+        if(!root)
+            return;
+        
+        if(level == ans.size())
+            ans.push_back(root->data);
+        
+        solve(root->right, ans, level+1);
+        solve(root->left, ans, level+1);
+    }
+    vector<int> rightView(Node *root)
+    {
+        vector<int> ans;
+        solve(root, ans, 0);
+        return ans;
+    }
+
+// Diagonal traversal
+
+vector<int> diagonal(Node *root)
+{
+    vector<int> ans;
+    queue<Node*> q;
+    if(!root)
+        return ans;
+        
+    q.push(root);
+    while(!q.empty())
+    {
+        Node* top = q.front();
+        q.pop();
+        while(top)
+        {
+            ans.push_back(top->data);
+            q.push(top->left);
+            top = top->right;
+        }
+    }
+    return ans;
+}
+
+// Sum of the Longest Bloodline of a Tree (Sum of nodes on the longest path from root to leaf node)
+
+    void solve(Node* root, int &maxlength, int &maxSum, int sum, int len)
+    {
+        if(!root)
+        {
+            if(len > maxlength)
+            {
+                maxlength = len;
+                maxSum = sum;
+            }else if(len == maxlength)
+                maxSum = max(sum, maxSum);
+                
+            return;
+        }
+        
+        solve(root->left, maxlength, maxSum, sum + root->data, len+1);
+        solve(root->right, maxlength, maxSum, sum + root->data, len+1);
+
+    }
+    int sumOfLongRootToLeafPath(Node *root)
+    {
+        int maxlength = INT_MIN;
+        int maxSum = 0;
+        solve(root, maxlength, maxSum, 0, 0);
+        return maxSum;
+    }
+
+// Function to return the lowest common ancestor in a Binary Tree.
+
+    Node* lca(Node* root ,int n1 ,int n2 )
+    {
+        if(!root)
+            return NULL;
+            
+        if(root->data == n1 || root->data == n2)
+            return root;
+        
+        Node* leftAns = lca(root->left, n1, n2);
+        Node* rightAns = lca(root->right, n1, n2);
+        
+        if(leftAns && rightAns)
+            return root;
+        else if(!leftAns && rightAns)
+            return rightAns;
+        else if(!rightAns && leftAns)
+            return leftAns;
+        else
+            return NULL;
+    }
+
+// k sum paths
+
+    void solve(Node* root, int k, vector<int> &path, int &count)
+    {
+        if(!root)
+            return;
+        
+        path.push_back(root->data);
+        int sum = 0;
+        
+        solve(root->left, k, path, count);
+        solve(root->right, k, path, count);
+        
+        for(int i=path.size()-1; i>=0; i--)
+        {
+            sum += path[i];
+            if(sum == k)
+                count++;
+        }
+        path.pop_back();
+    }
+    int sumK(Node *root,int k)
+    {
+        vector<int> path;
+        int count = 0;
+        solve(root, k, path, count);
+        return count;
+    }
+
+// kth ancestor of a tree
+
+// Approach 1
+
+int solve(Node* root, vector<int> path, int k, int node)
+{
+    int ans;
+    if(!root)
+        return -1;
+    
+    path.push_back(root->data);
+    
+    if(root->data == node)
+    {
+        int size = path.size();
+        int ind = size-k-1;
+        if(ind >= 0)
+            return path[ind];
+        else 
+            return -1;
+    }
+    
+    int result = solve(root->left, path, k, node);
+    if(result != -1)
+        return result;
+    
+    return solve(root->right, path, k, node);
+
+}
+int kthAncestor(Node *root, int k, int node)
+{
+    vector<int> path;
+    int ans = solve(root, path, k, node);
+    return ans;
+}
+
+// Approach 2
+
+Node* solve(Node *root, int &k, int node)
+{
+    if(!root)
+        return NULL;
+    
+    if(root->data == node)
+    {
+        return root;
+    }
+    
+    Node* leftAns = solve(root->left, k, node);
+    Node* rightAns = solve(root->right, k, node);
+    
+    if(leftAns && !rightAns)
+    {
+        k--;
+        if(k <= 0)
+        {
+            k = INT_MAX;
+            return root;
+        }
+        return leftAns;
+    }
+    if(rightAns && !leftAns)
+    {
+        k--;
+        if(k <= 0)
+        {
+            k = INT_MAX;
+            return root;
+        }
+        return rightAns;
+    }
+    
+    return NULL;
+}
+
+int kthAncestor(Node *root, int k, int node)
+{
+    Node* ans = solve(root, k, node);
+    if(!ans || ans->data == node)
+        return -1;
+    else
+        return ans->data;
+}
+
+// Maximum sum of non adjacent nodes
+
+    pair<int, int> solve(Node* root)
+    {
+        if(!root)
+        {
+            pair<int, int> p = make_pair(0, 0);
+            return p;
+        }
+        pair<int, int> left = solve(root->left);
+        pair<int, int> right = solve(root->right);
+        
+        pair<int, int> ans;
+        
+        ans.first = left.second + right.second + root->data;
+        ans.second = max(left.second, left.first) + max(right.second, right.first);
+        
+        return ans;
+    }
+    int getMaxSum(Node *root) 
+    {
+        pair<int, int> ans = solve(root);
+        return max(ans.first, ans.second);
+    }
+
+// tree from preorder and inorder
+
+class Solution{
+    public:
+    int findPos(int in[], int ele, int start, int end)
+    {
+        for(int i=start; i <= end; i++)
+        {
+            if(in[i] == ele)
+                return i;
+        }
+        return -1;
+    }
+    Node* solve(int in[], int pre[], int n, int &index, int start, int end)
+    {
+        if(index >= n || start > end)
+            return NULL;
+        
+        int element = pre[index++];
+        Node *root = new Node(element);
+        int pos = findPos(in, element, start, end);
+        
+        root->left = solve(in, pre, n, index, start, pos-1);
+        root->right = solve(in, pre, n, index, pos+1, end);
+        
+        return root;
+    }
+    Node* buildTree(int in[],int pre[], int n)
+    {
+        int index = 0;
+        Node* ans = solve(in, pre, n, index, 0, n-1);
+        return ans;
+    }
+};
+
+// Function to return a tree created from postorder and inoreder traversals.
+
+int findPos(int in[], int ele, int start, int end)
+{
+    for(int i=start; i <= end; i++)
+    {
+        if(in[i] == ele)
+            return i;
+    }
+    return -1;
+}
+Node* solve(int in[], int post[], int n, int &index, int start, int end)
+{
+    if(index < 0 || start > end)
+        return NULL;
+        
+    int element = post[index--];
+    Node *root = new Node(element);
+    int pos = findPos(in, element, start, end);
+        
+    root->right = solve(in, post, n, index, pos+1, end);
+    root->left = solve(in, post, n, index, start, pos-1);
+    
+    return root;
+}
+Node *buildTree(int in[], int post[], int n) {
+    int index = n-1;
+    Node* ans = solve(in, post, n, index, 0, n-1);
+    return ans;
+}

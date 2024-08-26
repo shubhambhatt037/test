@@ -1,0 +1,188 @@
+// Merge 2 BSTs
+//Approach 1
+void inorder(Node* root, vector<int> &in)
+{
+    if(!root)
+        return;
+    
+    inorder(root->left, in);
+    in.push_back(root->data);
+    inorder(root->right, in);
+}
+void merge(vector<int> in1, vector<int> in2, vector<int> &in)
+{
+    int ind1 = 0;
+    int ind2 = 0;
+    while(ind1<in1.size() && ind2<in2.size())
+    {
+        if(in1[ind1]<in2[ind2])
+            in.push_back(in1[ind1++]);
+        else
+            in.push_back(in2[ind2++]);
+    }
+    while(ind1<in1.size())
+        in.push_back(in1[ind1++]);
+    while(ind2<in2.size())
+        in.push_back(in2[ind2++]);
+}
+Node* makeBST(int s, int e, vector<int> in)
+{
+    if(s > e)
+        return NULL;
+    
+    int mid = (s+e)/2;
+    Node* root = new Node(in[mid]);
+    root->left = makeBST(s, mid-1, in);
+    root->right = makeBST(mid+1, e, in);
+    return root;
+}
+vector<int> merge(Node *root1, Node *root2)
+{
+    vector<int> in1, in2, in;
+    inorder(root1, in1);
+    inorder(root2, in2);
+    merge(in1, in2, in);
+    return in;
+}
+
+//Approach 2
+void convertsortedDLL(TreeNode<int> *root, TreeNode<int> *&head)
+{
+    if(!root)
+        return ;
+    
+    convertsortedDLL(root->right, head);
+
+    root->right = head;
+    if(head)
+        head->left = root;
+    head = root;
+
+    convertsortedDLL(root->left, head);
+}
+TreeNode<int>* mergeSortedDLL(TreeNode<int> *head1, TreeNode<int> *head2)
+{
+    TreeNode<int> *head = NULL;
+    TreeNode<int> *tail = NULL;
+
+    while(head1 && head2)
+    {
+        if(head1->data < head2->data)
+        {
+            if(!head)
+            {
+                head = head1;
+                tail = head1;
+                head1 = head1->right;
+            }
+            else
+            {
+                tail->right = head1;
+                head1->left = tail;
+                tail = head1;
+                head1 = head1->right;
+            }
+        }
+        else
+        {
+            if(!head)
+            {
+                head = head2;
+                tail = head2;
+                head2 = head2->right;
+            }
+            else
+            {
+                tail->right = head2;
+                head2->left = tail;
+                tail = head2;
+                head2 = head2->right;
+            }
+        }
+    }
+    while(head1)
+    {
+        tail->right = head1;
+        head1->left = tail;
+        tail = head1;
+        head1 = head1->right;
+    }
+    while(head2)
+    {
+        tail->right = head2;
+        head2->left = tail;
+        tail = head2;
+        head2 = head2->right;
+    }
+    return head;
+}
+int countNodes(TreeNode<int> *&head)
+{
+    int count = 0;
+    TreeNode<int>* temp = head;
+    while(temp)
+    {
+        count++;
+        temp = temp->right;
+    }
+    return count;
+}
+TreeNode<int> *sortedDLLtoBST(TreeNode<int>* &head, int n)
+{
+    if(n<=0 || !head)
+        return NULL;
+    
+    TreeNode<int>* left = sortedDLLtoBST(head, n/2);
+
+    TreeNode<int>* root = head;
+    root->left = left;
+    head = head->right;
+
+    root->right = sortedDLLtoBST(head, n-n/2-1);
+    return root;
+}
+TreeNode<int> *mergeBST(TreeNode<int> *root1, TreeNode<int> *root2)
+{
+    TreeNode<int> *head1 = NULL;
+    TreeNode<int> * head2 = NULL;
+
+    convertsortedDLL(root1, head1);
+    head1->left = NULL;
+
+    convertsortedDLL(root2, head2);
+    head2->left = NULL;
+
+    TreeNode<int> *head = mergeSortedDLL(head1, head2);
+    return sortedDLLtoBST(head, countNodes(head));
+}
+
+// Largest BST in a Binary Tree
+info solve(TreeNode<int>* root,int &size)
+{
+    if(!root)
+        return{INT_MAX, INT_MIN, 0, true};
+    
+    info left = solve(root->left, size);
+    info right = solve(root->right, size);
+
+    info curr;
+    curr.min = min(root->data, left.min);
+    curr.max = max(root->data, right.max);
+    curr.size = left.size + right.size + 1;
+
+    if(left.isBST && right.isBST && (root->data > left.max && root->data < right.min))
+        curr.isBST = true;
+    else
+        curr.isBST = false;
+    
+    if(curr.isBST)
+        size = max(size, curr.size);
+    
+    return curr;
+}
+int largestBST(TreeNode<int>* root) 
+{
+    int size = 0;
+    info temp = solve(root, size);
+    return size;
+}

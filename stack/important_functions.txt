@@ -1,0 +1,474 @@
+POP middle element from stack
+
+void solve(stack<int>&inputStack, int count,int size)
+{
+    //base case
+    if(count == size/2){
+        inputStack.pop();
+        return;
+    }
+    
+    int num = inputStack.top();
+    inputStack.pop();
+    
+    //recursive call
+    solve(inputStack,count+1,size);
+    inputStack.push(num);
+    
+}
+void deleteMiddle(stack<int>&inputStack, int N){
+    solve(inputStack,0,N);
+}
+
+Valid Parenthesis
+
+bool isValidParenthesis(string expression)
+{
+    stack<int> s;
+    for(int i=0 ; i < expression.length() ; i++)
+    {
+        char ch = expression[i];
+        
+        if(ch == '(' || ch == '{' || ch == '[')
+        {
+            s.push(ch);
+        }else{
+            if(!s.empty())
+            {
+                if((ch == ')' && s.top() == '(')||
+                   (ch == '}' && s.top() == '{')||
+                   (ch == ']' && s.top() == '['))
+                    s.pop();
+                else 
+                    return false;
+            }else
+                return false;
+        }
+    }
+    if(s.empty())
+        return true;
+}
+
+Push an element in bottom
+
+void solve(stack<int>& myStack, int x)
+{
+    if(myStack.empty()){
+        myStack.push(x);
+        return;
+    }
+    int num = myStack.top();
+    myStack.pop();
+    
+    solve(myStack,x);
+    myStack.push(num);
+}
+stack<int> pushAtBottom(stack<int>& myStack, int x) 
+{
+    solve(myStack,x);
+    return myStack;
+}
+
+Reversing a stack using recursion
+
+void insertAtBottom(stack<int> &stack,int ele)
+{
+    if(stack.empty())
+    {
+        stack.push(ele);
+        return;
+    }
+    
+    int num = stack.top();
+    stack.pop();
+    
+    insertAtBottom(stack,ele);
+    stack.push(num);
+}
+void reverseStack(stack<int> &stack) {
+    if(stack.empty())
+        return ;
+    
+    int num = stack.top();
+    stack.pop();
+    
+    reverseStack(stack);
+    insertAtBottom(stack,num);
+}
+
+Sort a stack
+
+oid InsertSorted(stack<int> &stack,int ele)
+{
+    if(stack.empty() || stack.top() < ele)
+    {
+        stack.push(ele);
+        return;
+    }
+    
+    int num = stack.top();
+    stack.pop();
+    
+    InsertSorted(stack,ele);
+    stack.push(num);
+}
+void sortStack(stack<int> &stack)
+{
+	if(stack.empty())
+        return;
+    
+    int num = stack.top();
+    stack.pop();
+    
+    sortStack(stack);
+    InsertSorted(stack,num);
+}
+
+redundant bracket
+
+bool findRedundantBrackets(string &s)
+{
+    stack<char> st;
+    for(int i =0 ; i < s.length() ; i++)
+    {
+        char ch = s[i];
+        if(ch == '(' || ch == '*' || ch == '/' || ch == '+' || ch == '-'){
+            st.push(ch);
+        }else{
+            if(ch == ')')
+            {
+                bool isredundant = true;
+                while(st.top() != '(')
+                {
+                    char top = st.top();
+                    if(top == '*' || top == '/' || top == '+' || top == '-')
+                    {
+                        isredundant = false;
+                    }
+                    st.pop();
+                }
+                if(isredundant)
+                    return true;
+                st.pop();
+            }
+        }
+    }
+    return false;
+}
+
+minimum cost to make string Valid
+
+int findMinimumCost(string str) {
+    stack<char> st;
+    int count = 0;
+    int count1 = 0;
+    if(str.length()%2 != 0)
+        return -1;
+    for(int i =0; i < str.length() ; i++)
+    {
+        char ch = str[i];
+        
+        if(ch == '{'){
+            st.push(ch);
+            count++;
+        }
+        else
+        {
+            if(!st.empty() && st.top() != '}')
+            {
+                st.pop();
+                count--;
+            }else 
+                count1++;
+        }
+    }
+    if(count1 == 0 && count == 0 )
+        return 0;
+    return ((count1+1)/2 + (count+1)/2);
+}
+
+Next Smaller element
+
+vector<int> nextSmallerElement(vector<int> &arr, int n)
+{
+    stack<int> st;
+    vector<int> ans(n);
+    st.push(-1);
+    for(int i =n-1 ; i >= 0 ; i--)
+    {
+        int num = arr[i];
+        while(st.top() >= num)
+        {
+            st.pop();
+        }
+        ans[i] = st.top();
+        st.push(num);
+    }
+    return ans;
+}
+
+Area of histogram
+
+class Solution {
+private:
+    vector<int> nextSmallerElement(vector<int> arr, int n) {
+        stack<int> s;
+        s.push(-1);
+        vector<int> ans(n);
+
+        for(int i=n-1; i>=0 ; i--) {
+            int curr = arr[i];
+            while(s.top() != -1 && arr[s.top()] >= curr)
+            {
+                s.pop();
+            }
+            //ans is stack ka top
+            ans[i] = s.top();
+            s.push(i);
+        }
+        return ans;
+    }
+    
+    vector<int> prevSmallerElement(vector<int> arr, int n) {
+        stack<int> s;
+        s.push(-1);
+        vector<int> ans(n);
+
+        for(int i=0; i<n; i++) {
+            int curr = arr[i];
+            while(s.top() != -1 && arr[s.top()] >= curr)
+            {
+                s.pop();
+            }
+            //ans is stack ka top
+            ans[i] = s.top();
+            s.push(i);
+        }
+        return ans; 
+    }
+    
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int n= heights.size();
+        
+        vector<int> next(n);
+        next = nextSmallerElement(heights, n);
+            
+        vector<int> prev(n);
+        prev = prevSmallerElement(heights, n);
+        
+        int area = INT_MIN;
+        for(int i=0; i<n; i++) {
+            int l = heights[i];
+            
+            if(next[i] == -1) {
+                next[i] = n;
+            }
+            int b = next[i] - prev[i] - 1;
+            int newArea = l*b;
+            area = max(area, newArea);
+        }
+        return area;
+    }
+};
+
+Celebrity or not
+
+class Solution 
+{
+    private:
+    bool knows(vector<vector<int> >& M, int a ,int b)
+    {
+        if(M[a][b] == 1)
+            return true;
+        return false;
+    }
+    public:
+    //Function to find if there is a celebrity in the party or not.
+    int celebrity(vector<vector<int> >& M, int n) 
+    {
+        stack<int> s;
+        
+        for(int i = 0 ; i < n ; i++)
+        {
+            s.push(i);
+        }
+        
+        while(s.size() > 1)
+        {
+            int a = s.top();
+            s.pop();
+            
+            int b = s.top();
+            s.pop();
+            
+            if(knows(M,a,b))
+                s.push(b);
+            else
+                s.push(a);
+        }
+        int candidate = s.top();
+        bool flag1 = true, flag2 = true;
+        for(int i = 0 ; i < n ; i++)
+        {
+            if(i != candidate && M[candidate][i] == 1)
+                flag1 = false;
+        }
+        for(int i = 0 ; i < n ; i++)
+        {
+            if(i != candidate && M[i][candidate] == 0)
+                flag2 = false;
+        }   
+        if(flag1 && flag2)
+            return candidate;
+        return -1;
+    }
+};
+
+Maximum area of triangle
+
+class Solution{
+  private:
+  
+    vector<int> nextSmallerElement(int *arr, int n) {
+        stack<int> s;
+        s.push(-1);
+        vector<int> ans(n);
+
+        for(int i=n-1; i>=0 ; i--) {
+            int curr = arr[i];
+            while(s.top() != -1 && arr[s.top()] >= curr)
+            {
+                s.pop();
+            }
+            //ans is stack ka top
+            ans[i] = s.top();
+            s.push(i);
+        }
+        return ans;
+    }
+    vector<int> prevSmallerElement(int* arr, int n) {
+        stack<int> s;
+        s.push(-1);
+        vector<int> ans(n);
+
+        for(int i=0; i<n; i++) {
+            int curr = arr[i];
+            while(s.top() != -1 && arr[s.top()] >= curr)
+            {
+                s.pop();
+            }
+            //ans is stack ka top
+            ans[i] = s.top();
+            s.push(i);
+        }
+        return ans; 
+    }    
+    int largestRectangleArea(int* heights, int n) {
+        //int n= heights.size();
+        
+        vector<int> next(n);
+        next = nextSmallerElement(heights, n);
+            
+        vector<int> prev(n);
+        prev = prevSmallerElement(heights, n);
+        
+        int area = INT_MIN;
+        for(int i=0; i<n; i++) {
+            int l = heights[i];
+            
+            if(next[i] == -1) {
+                next[i] = n;
+            }
+             int b = next[i] - prev[i] - 1;
+            int newArea = l*b;
+            area = max(area, newArea);
+        }
+        return area;
+    }
+    public:
+    int maxArea(int M[MAX][MAX], int n, int m) {
+        
+        int area = largestRectangleArea(M[0] , m);
+        
+        for(int i = 1 ; i < n ; i++)
+        {
+            for(int j = 0 ; j < m ; j++)
+            {
+                if(M[i][j] != 0)
+                    M[i][j] += M[i-1][j];
+                else
+                    M[i][j] = 0;
+            }
+            area = max(area,largestRectangleArea(M[i] , m));
+        }
+        return area;
+    }
+};
+
+Getmin in O(1) time and O(1) space complexity
+
+class SpecialStack {
+    public:
+    stack<int> s;
+    int mini = INT_MAX;
+    void push(int data) {
+        if(isEmpty())
+        {
+            s.push(data);
+            mini = data;
+        }else{
+            if(data >= mini)
+                s.push(data);
+            else{
+                int val = 2*data - mini;
+                s.push(val);
+                mini = data;
+            }
+        }
+    }
+
+    int pop() {
+        if(isEmpty())
+            return -1;
+        else{
+            int curr = s.top();
+            if(curr >= mini)
+            {
+                s.pop();
+                return curr;
+            }else{
+                int prevmini = mini;
+                int val = 2*mini - curr;
+                s.pop();
+                mini = val;
+                return prevmini;
+            }
+        }
+    }
+
+    int top() {
+        if(isEmpty())
+            return -1;
+        else{
+            int num = s.top();
+            if(num > mini)
+                return num;
+            else
+                return mini;
+        }
+    }
+
+    bool isEmpty() {
+        if(s.empty())
+            return true;
+        else
+            return false;
+    }
+    
+    int getMin() {
+        if(isEmpty())
+            return -1;
+        return mini;
+    }  
+};

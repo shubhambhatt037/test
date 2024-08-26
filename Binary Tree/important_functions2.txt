@@ -1,0 +1,130 @@
+// Burning tree
+
+class Solution {
+  public:
+    Node* createmapping(Node* root, int target, map<Node*,Node*> &nodetoparent)
+    {
+        Node* res = NULL;
+        queue<Node*> q;
+        q.push(root);
+        nodetoparent[root] = NULL;
+        
+        while(!q.empty())
+        {
+            Node* front = q.front();
+            q.pop();
+            
+            if(front->data == target)
+            {
+               res = front;
+            }
+            if(front->left)
+            {
+                q.push(front->left);
+                nodetoparent[front->left] = front;
+            }
+            if(front->right)
+            {
+                q.push(front->right);
+                nodetoparent[front->right] = front;
+            }
+        }
+        return res;
+    }
+    int burntree(Node* targetnode, map<Node*, Node*> &nodetoparent)
+    {
+        map<Node*, bool> visited;
+        queue<Node*> q;
+        q.push(targetnode);
+        visited[targetnode] = true;
+        int ans = 0;
+        
+        while(!q.empty())
+        {
+            bool flag = false;
+            int size = q.size();
+            for(int i=0; i< size; i++)
+            {
+                Node* temp = q.front();
+                q.pop();
+                
+                if(temp->left && !visited[temp->left])
+                {
+                    visited[temp->left] = true;
+                    q.push(temp->left);
+                    flag = true;
+                }
+                if(temp->right && !visited[temp->right])
+                {
+                    visited[temp->right] = true;
+                    q.push(temp->right);
+                    flag = true;
+                }
+                if(nodetoparent[temp] && !visited[nodetoparent[temp]])
+                {
+                    visited[nodetoparent[temp]] = true;
+                    q.push(nodetoparent[temp]);
+                    flag = true;
+                }
+            }
+            if(flag)
+                ans++;
+        }
+        return ans;
+    }
+    int minTime(Node* root, int target) 
+    {
+        map<Node*, Node*> nodetoparent;
+        Node* targetnode = createmapping(root, target, nodetoparent);
+        int ans = burntree(targetnode, nodetoparent);
+        return ans;
+    }
+};
+
+// Flatten a Binary tree
+
+void flatten(Node *root)
+{
+    Node* curr = root;
+    while(curr)
+    {
+        if(curr->left)
+        {
+            Node* pred = curr->left;
+            while(pred->right)
+                pred = pred->right;
+            
+            pred->right = curr->right;
+            curr->right = curr->left;
+            curr->left = NULL;
+        }
+        curr = curr->right;
+    }
+}
+
+// checkness of complete binary tree
+
+bool isCompleteTree(TreeNode* root) {
+        if(!root)
+            return true;
+        
+        queue<TreeNode*> q;
+        bool foundnull = false;
+        q.push(root);
+        while(!q.empty())
+        {
+            TreeNode* node = q.front();
+            q.pop();
+
+            if(!node)
+                foundnull = true;
+            else{
+                if(foundnull)
+                    return false;
+                    
+                q.push(node->left);
+                q.push(node->right);
+            }
+        }
+        return true;
+    }

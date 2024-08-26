@@ -1,0 +1,206 @@
+// Cycle detection in Directed Graphs
+
+bool checkCycleDFS(int node, unordered_map<int, bool> &visited, 
+  unordered_map<int, bool> &dfsvisited, unordered_map<int, list<int>> &adj)
+{
+  visited[node] = true;
+  dfsvisited[node] = true;
+
+  for(auto neighbour: adj[node])
+  {
+    if(!visited[neighbour])
+    {
+      bool cycleDetected = checkCycleDFS(neighbour, visited, dfsvisited, adj);
+      if(cycleDetected)
+        return true;
+    }
+    else if(dfsvisited[neighbour])
+    {
+      return true;
+    }
+  }
+  dfsvisited[node] = false;
+  return false;
+}
+
+int detectCycleInDirectedGraph(int n, vector < pair < int, int >> & edges) {
+  // create adj list
+  unordered_map<int, list<int>> adj;
+  for(int i=0; i<edges.size(); i++)
+  {
+    int u = edges[i].first;
+    int v = edges[i].second;
+
+    adj[u].push_back(v);
+  }
+
+  // call dfs for all components
+  unordered_map<int, bool> visited;
+  unordered_map<int, bool> dfsvisited;
+  for(int i=1; i <= n; i++)
+  {
+    if(!visited[i])
+    {
+      bool cycleFound = checkCycleDFS(i, visited, dfsvisited, adj);
+      if(cycleFound)
+        return true;
+    }
+  }
+  return false;
+}
+
+// topological sort
+
+#include <bits/stdc++.h> 
+void topoSort(int node, vector<bool> &visited, stack<int> &s, unordered_map<int, list<int>> &adj)
+{
+    visited[node] = true;
+
+    for(auto neighbour: adj[node])
+    {
+        if(!visited[neighbour])
+            topoSort(neighbour, visited, s, adj);
+    }
+    
+    s.push(node);
+}
+vector<int> topologicalSort(vector<vector<int>> &edges, int v, int e)
+{
+    unordered_map<int, list<int>> adj;
+
+    for(int i=0; i<e; i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        adj[u].push_back(v);
+    }
+
+    vector<bool> visited(v);
+    stack<int> s;
+    for(int i=0; i<v; i++)
+    {
+        if(!visited[i])
+            topoSort(i, visited, s, adj);
+    }
+
+    vector<int> ans;
+    while(!s.empty())
+    {
+        ans.push_back(s.top());
+        s.pop();
+    }
+
+    return ans;
+}
+
+// topologicalSort using kahn's algorithm
+
+#include <bits/stdc++.h> 
+vector<int> topologicalSort(vector<vector<int>> &edges, int v, int e){
+    unordered_map<int ,list<int>> adj;
+    
+    for(int i=0; i<e; i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        adj[u].push_back(v);
+    }
+    
+    // find all indegrees
+    vector<int> indegree(v);
+    for(auto i: adj)
+    {
+        for(auto j: i.second)
+        {
+            indegree[j]++;
+        }
+    }
+
+    // push all with 0 indegree
+    queue<int> q;
+    for(int i=0; i<v; i++)
+    {
+        if(indegree[i] == 0)
+            q.push(i);
+    }
+    
+    // bfs
+    vector<int> ans;
+    while (!q.empty()) {
+        int front = q.front();
+        q.pop();
+
+        // ans store
+        ans.push_back(front);
+        
+        // neighbour indegree update
+        for(auto neighbour: adj[front])
+        {
+            indegree[neighbour]--;
+            if(indegree[neighbour] == 0)
+                q.push(neighbour);
+        }
+    }
+
+    return ans;
+}
+
+// shortest path in unordered Graph
+
+#include<unordered_map>
+#include<list>
+#include<queue>
+
+vector<int> shortestPath( vector<pair<int,int>> edges , int n , int m, int s , int t){
+	
+	unordered_map<int, list<int>> adj;
+
+	for(int i=0; i<edges.size(); i++)
+	{
+		int u = edges[i].first;
+		int v = edges[i].second;
+
+		adj[u].push_back(v);
+		adj[v].push_back(u);
+	}
+	
+	// do bfs
+	unordered_map<int, bool> visited;
+	unordered_map<int, int> parent;
+	queue<int> q;
+	q.push(s);
+
+	parent[s] = -1;
+	visited[s] = true;
+
+	while(!q.empty())
+	{
+		int front = q.front();
+		q.pop();
+
+		for(auto i: adj[front])
+		{
+			if(!visited[i])
+			{
+				visited[i] = true;
+				parent[i] = front;
+				q.push(i);
+			}
+		}
+	}
+
+	// shortest path
+	vector<int> ans;
+	int currenNode = t;
+	ans.push_back(t);
+
+	while(currenNode != s)
+	{
+		currenNode = parent[currenNode];
+		ans.push_back(currenNode);
+	}
+
+	reverse(ans.begin(), ans.end());
+	return ans;
+}

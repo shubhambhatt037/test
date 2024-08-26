@@ -1,0 +1,121 @@
+// N queen problem
+
+#include <bits/stdc++.h> 
+
+void addSolution(vector<vector<int>> &ans, vector<vector<int>> &board, int n)
+{
+	vector<int> temp;
+	for(int i=0; i<n; i++)
+		for(int j=0; j<n; j++)
+			temp.push_back(board[i][j]);
+
+	ans.push_back(temp);
+}
+bool isSafe(int r, int c, vector<vector<int>> &board, int n)
+{
+	int x = r;
+	int y = c;
+
+	while(y >= 0)
+	{
+		if(board[x][y] == 1)
+			return false;
+		y--;
+	}
+
+	x = r;
+	y = c;
+	while(x >= 0 && y >= 0)
+	{
+		if(board[x][y] == 1)
+			return false;
+		x--;
+		y--;
+	}
+
+	x = r;
+	y = c;
+	while(x < n && y >= 0)
+	{
+		if(board[x][y] == 1)
+			return false;
+		x++;
+		y--;
+	}
+
+	return true;
+}
+void solve(int cols, vector<vector<int>> &ans, vector<vector<int>> &board, int n)
+{
+	if(cols == n)
+	{
+		addSolution(ans, board, n);
+		return;
+	}
+
+	//solve 1 case
+	for(int row=0; row<n; row++)
+	{
+		if(isSafe(row, cols, board, n))
+		{
+			board[row][cols] = 1;
+			solve(cols+1, ans, board, n);
+
+			//backtrack
+			board[row][cols] = 0;
+		}
+	}
+}
+vector<vector<int>> nQueens(int n)
+{
+	vector<vector<int>> ans;
+	vector<vector<int>> board(n, vector<int>(n,0));
+
+	solve(0, ans, board, n);
+	return ans;
+}
+
+// sudoku
+
+#include <bits/stdc++.h> 
+
+bool isValid(vector<vector<int>> &sudoku, int row, int col, int digit){
+    for(int i=0; i<9; i++){
+        if(sudoku[row][i] == digit) return false;
+        if(sudoku[i][col] == digit) return false;
+        if(sudoku[3*(row/3)+i/3][3*(col/3)+i%3] == digit) return false;
+    }
+
+    return true;
+}
+
+bool solve(vector<vector<int>> &sudoku){
+
+    for(int i=0; i<9; i++){
+        for(int j=0; j<9; j++){
+
+            if(sudoku[i][j] == 0){
+
+                for(int d=1; d<=9; d++){
+                    if(isValid(sudoku, i, j, d)){
+                        sudoku[i][j] = d;
+
+                        if(solve(sudoku)) return true;
+                        else{
+                            sudoku[i][j] = 0;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+void solveSudoku(vector<vector<int>>& sudoku)
+{
+    solve(sudoku);
+}

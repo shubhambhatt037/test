@@ -1,0 +1,312 @@
+// creating and printing adjacency list
+
+vector < vector < int >> printAdjacency(int n, int m, vector < vector < int >> & edges) {
+    vector<int> ans[n];
+    //ans will store adjacing nodes corresponding on indexes
+    for(int i=0; i<m; i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        ans[u].push_back(v);
+        ans[v].push_back(u);
+    }
+
+    vector< vector<int>> adj(n);
+    for(int i=0; i<n; i++)
+    {
+        adj[i].push_back(i);
+
+        //entering neighbours
+        for(int j=0; j<ans[i].size(); j++)
+            adj[i].push_back(ans[i][j]);
+    }
+    return adj;
+}
+
+// BFS traversal
+
+#include <bits/stdc++.h> 
+void prepareAdjList(unordered_map<int, list<int>> &adjList, 
+vector<pair<int, int>> &edges)
+{
+    for(int i=0; i<edges.size(); i++)
+    {
+        int u = edges[i].first;
+        int v = edges[i].second;
+
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
+    }
+}
+void bfs(unordered_map<int, list<int>> &adjList, 
+unordered_map<int, bool> &visited, vector<int> &ans, int node)
+{
+    queue<int> q;
+    q.push(node);
+    visited[node] = 1;
+
+    while(!q.empty())
+    {
+        int frontnode = q.front();
+        q.pop();
+
+        // store frontnode into ANS
+        ans.push_back(frontnode);
+
+        // traverse all neighbours of frontnode
+        for(auto i: adjList[frontnode])
+        {
+            if(!visited[i])
+            {
+                q.push(i);
+                visited[i] = 1;
+            }
+        }
+    }
+}
+vector<int> BFS(int vertex, vector<pair<int, int>> edges)
+{
+    unordered_map<int, list<int>> adjList;
+    vector<int> ans;
+    unordered_map<int, bool> visited;
+
+    prepareAdjList(adjList, edges);
+
+    // traverse all components of graph
+    for(int i=0; i<vertex; i++)
+    {
+        if(!visited[i])
+            bfs(adjList, visited, ans, i);
+    }
+    return ans;
+}
+
+// dfs traversal
+
+void dfs(unordered_map<int, list<int>> &adjList, unordered_map<int, bool> &visited,
+ vector<int> &component, int node)
+ {
+    component.push_back(node);
+    visited[node] = 1;
+
+    // check for every connected node
+    for(auto i: adjList[node])
+    {
+        if(!visited[i])
+            dfs(adjList, visited, component, i);
+    }
+ }
+vector<vector<int>> depthFirstSearch(int V, int E, vector<vector<int>> &edges)
+{
+    unordered_map<int, list<int>> adjList;
+    for(int i=0; i<edges.size(); i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
+    }
+
+    vector<vector<int>> ans;
+    unordered_map<int, bool> visited;
+
+    for(int i=0; i<V; i++)
+    {
+        if(!visited[i])
+        {
+            vector<int> component;
+            dfs(adjList, visited, component, i);
+            ans.push_back(component);
+        }
+    }  
+    return ans;  
+}
+
+// Bridges in a graph
+
+#include<unordered_map>
+#include<list>
+#include<vector>
+
+void dfs(int node, int parent, int &timer, vector<int> &disc, vector<int> &low, vector<vector<int>> &result,
+unordered_map<int, list<int>> &adj, unordered_map<int, bool> &vis)
+{
+    vis[node] = true;
+    disc[node] = low[node] = timer++;
+
+    for(auto nbr: adj[node])
+    {
+        if(nbr == parent)
+            continue;
+        
+        if(!vis[nbr])
+        {
+            dfs(nbr, node, timer, disc, low, result, adj, vis);
+            low[node] = min(low[node], low[nbr]);
+            // check edge is bridge
+            if(low[nbr] > disc[node])
+            {
+                vector<int> ans;
+                ans.push_back(node);
+                ans.push_back(nbr);
+                result.push_back(ans);
+            }
+        }else{
+            // back edge
+            low[node] = min(low[node], disc[nbr]);
+        }
+    }
+}
+vector<vector<int>> findBridges(vector<vector<int>> &edges, int v, int e) {
+    vector<vector<int>> result;
+    unordered_map<int, list<int> > adj;
+
+    for(int i=0; i<edges.size(); i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    int timer = 0;
+    vector<int> disc(v);
+    vector<int> low(v);
+    int parent = -1;
+    unordered_map<int, bool> vis;
+
+    for(int i=0; i<v; i++)
+    {
+        disc[i] = -1;
+        low[i] = -1;
+    }
+
+    for(int i=0; i<v; i++)
+    {
+        if(!vis[i])
+            dfs(i, parent, timer, disc, low, result, adj, vis);
+    }
+    return result;
+}
+
+// Kosaraju's Algorithm for Strongly Connected Components
+
+#include<unordered_map>
+#include<list>
+#include<stack>
+
+void dfs(int node, unordered_map<int, bool> &vis, stack<int> &st, 
+unordered_map<int, list<int> > &adj)
+{
+	vis[node] = true;
+	for(auto nbr: adj[node])
+	{
+		if(!vis[nbr])
+			dfs(nbr, vis, st, adj);
+	}
+	// topo logic
+	st.push(node);
+}
+
+void revDFS(int node, unordered_map<int, bool> &vis, 
+unordered_map<int, list<int> > &transpose)
+{
+	vis[node] = true;
+	for(auto nbr: transpose[node])
+	{
+		if(!vis[nbr])
+			revDFS(nbr, vis, transpose);
+	}
+}
+
+int stronglyConnectedComponents(int v, vector<vector<int>> &edges)
+{
+	unordered_map<int, list<int> > adj;
+	for(int i=0; i<edges.size(); i++)
+	{
+		int u = edges[i][0];
+		int v = edges[i][1];
+
+		adj[u].push_back(v);
+	}
+
+	// topo sort
+	stack<int> st;
+	unordered_map<int, bool> vis;
+	for(int i=0; i<v; i++)
+	{
+		if(!vis[i])
+			dfs(i, vis, st, adj);
+	}
+
+	int count = 0;
+
+	//transpose graph
+	unordered_map<int, list<int> > transpose;
+	for(int i=0; i<v; i++)
+	{
+		vis[i] = 0;
+		for(auto nbr:adj[i])
+		{
+			transpose[nbr].push_back(i);
+		}
+	}
+
+	//dfs int transpose using st
+
+	while(!st.empty())
+	{
+		int i = st.top();
+		st.pop();
+
+		if (!vis[i]) {
+			count++;
+			revDFS(i, vis, transpose);
+		}
+    }
+	return count;
+}
+
+// Belman Ford 
+
+vector<int> bellmonFord(int n, int m, int src, int dest, vector<vector<int>> &edges) {
+
+    vector<int> dist(n+1, 1e9);
+    dist[src] = 0;
+
+    // n-1 times
+
+    for(int i=1; i<=n; i++)
+    {
+        for(int j=0; j<m; j++)
+        {
+            int u = edges[j][0];
+            int v = edges[j][1];
+            int wt = edges[j][2];
+
+            if(dist[u] != 1e9 && dist[u]+wt < dist[v])
+                dist[v] = dist[u]+wt;
+        }
+    }
+
+    // negative weight cycle
+    
+    /int flag = 0;
+    for(int j=0; j<m; j++)
+    {
+        int u = edges[j][0];
+        int v = edges[j][1];
+        int wt = edges[j][2];
+
+        if(dist[u] != 1e9 && (dist[u]+wt < dist[v]))
+            flag=1;
+    }
+
+    if(flag == 0)
+        return dist[dest];
+    
+    // return -1;
+}

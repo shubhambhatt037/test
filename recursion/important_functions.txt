@@ -1,0 +1,55 @@
+Generate Parenthesis
+
+class Solution {
+    vector<string> ans;
+public:
+    void solve(string &st, int start, int end, int n)
+    {
+        if(st.size() == 2*n)
+        {
+            ans.push_back(st);
+            return;
+        }
+        if(start < n)
+        {
+            st.push_back('(');
+            solve(st,start+1,end,n);
+            st.pop_back();
+        }
+        if(end < start)
+        {
+            st.push_back(')');
+            solve(st,start,end+1,n);
+            st.pop_back();
+        }
+    }
+    vector<string> generateParenthesis(int n) {
+        string st;
+        solve(st,0,0,n);
+        return ans;
+    }
+};
+
+sum of subsets
+
+class Solution
+{
+    void sumset(int ind, int sum, vector<int> arr, int n, vector<int> &subsum)
+    {
+        if(ind == n)
+        {
+            subsum.push_back(sum);
+            return;
+        }
+        sumset(ind+1,sum + arr[ind], arr, n, subsum);
+        sumset(ind+1, sum, arr, n, subsum);
+    }
+public:
+    vector<int> subsetSums(vector<int> arr, int N)
+    {
+        vector<int> subsum;
+        sumset(0, 0, arr, N, subsum);
+        sort(subsum.begin(), subsum.end());
+        return subsum;
+    }
+};

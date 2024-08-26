@@ -1,0 +1,1086 @@
+Merge two sorted lists
+
+Node<int>* sortList(Node<int>* first, Node<int>* second)
+{
+    if(first->next == NULL)
+    {
+        first->next = second;
+        return first;
+    }
+    Node<int>* curr1 = first;
+    Node<int>* next1 = curr1->next;
+    Node<int>* curr2 = second;
+    Node<int>* next2 = curr2->next;
+    
+    while(next1 != NULL && curr2 != NULL)
+    {
+        if(/*(curr2->data >= curr1->data) &&*/ next1->data >= curr2->data)
+        {
+            curr1->next = curr2;
+            next2 = curr2->next;
+            curr2->next = next1;
+            
+            curr1 = curr2;
+            curr2 = next2;
+        }
+        else
+        {
+            curr1 = next1;
+            next1 = next1->next;
+            if(next1 == NULL)
+            {
+                curr1->next = curr2;
+                return first;
+            }
+        }
+    }
+    return first;
+}
+
+Node<int>* sortTwoLists(Node<int>* first, Node<int>* second)
+{
+    // Write your code here.
+    if(first == NULL)
+        return second;
+    if(second == NULL)
+        return first;
+    
+    if(first->data <= second->data)
+        return sortList(first,second);
+    else
+        return sortList(second,first);
+}
+
+Sort 0s, 1s and 2s
+
+Node* sortList(Node *head)
+{
+    int zeroCount = 0 ;
+    int oneCount = 0;
+    int twoCount = 0;
+    
+    Node *temp = head;
+    
+    while(temp != NULL)
+    {
+        if(temp->data == 0)
+            zeroCount++;
+        else if(temp->data == 1)
+            oneCount++;
+        else if(temp->data == 2)
+            twoCount++;
+        
+        temp = temp->next;
+    }
+    temp = head;
+    while(temp != NULL)
+    {
+        if(zeroCount != 0)
+        {
+            temp->data = 0;
+            zeroCount--;
+        }
+        else if(oneCount != 0)
+        {
+            temp->data = 1;
+            oneCount--;
+        }
+        else if(twoCount != 0)
+        {
+            temp->data = 2;
+            twoCount--;
+        }
+        temp = temp->next;
+    }
+    return head;
+}
+
+Reverse a linked list in k group
+
+Node* kReverse(Node* head, int k) {
+    // Write your code here.
+    Node *curr = head;
+    Node *prev = NULL;
+    Node *forward = NULL;
+    int cnt = 1;
+    if(head == NULL)
+        return NULL;
+    while(cnt <= k && curr != NULL)
+    {
+        forward = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = forward;
+        cnt++;
+    }
+    
+    if(forward != NULL)
+        head->next = kReverse(forward,k);
+    
+    return prev;
+}
+
+Circular linked list or not
+
+bool isCircular(Node* head){
+    // Write your code here.
+    if(head == NULL )
+        return true;
+    if(head->next == NULL)
+        return false;
+    
+    Node* temp = head->next;
+    while(temp->next != head && temp->next != NULL)
+    {
+        temp = temp->next;
+    }
+    if(temp->next == head)
+            return true;
+    if(temp->next == NULL)
+            return false;
+}
+
+Detect loop in linked list
+
+#include<map>
+bool detectloop(Node *head)
+{
+    if(head == NULL)
+        return 0;
+    Node *temp = head;
+    map<Node*, bool> visited;
+    
+    while(temp->next != NULL)
+    {
+        if(visited[temp->next] == true)
+        {
+            temp->next = NULL;
+            return 1;
+        }
+        visited[temp] = true;
+        temp = temp->next;
+    }
+    return 0;
+}
+
+approach 2 to detect loop
+
+Node *floyddetectLoop(Node *head)
+{
+    // Write your code here.
+    Node *slow = head;
+    Node *fast = head->next;
+    while(slow != fast && fast != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next;
+        if(fast != NULL && fast->next != NULL)
+        {
+            fast = fast->next;
+        }
+    }
+    if(fast == slow)
+        return 1;
+        
+    return 0;
+}
+
+Remove duplicates from sorted linked list
+
+Node * uniqueSortedList(Node * head) {
+    // Write your code here.
+    if(head == NULL)
+        return NULL;
+    
+    Node *temp = head;
+    
+    while(temp != NULL)
+    {
+        if((temp->next != NULL) && temp->data == temp->next->data)
+        {
+            Node *nodetodelete = temp->next;
+            temp->next = temp->next->next;
+            delete(nodetodelete);
+        }else
+            temp = temp->next;
+        
+    }
+    return head;
+}
+
+Remove duplicates from unsorted linked list
+
+#include<map>
+Node *removeDuplicates(Node *head)
+{
+    Node *curr = head;
+    map<int , bool> visited;
+    while(curr != NULL)
+    {
+        visited[curr->data] = true;
+        if((curr->next != NULL) && visited[curr->next->data] == true)
+        {
+            Node *todelete = curr->next;
+            curr->next = curr->next->next;
+            delete(todelete);
+        }
+        else
+            curr = curr->next;
+    }
+    return head;
+    
+}
+
+Check palindrome in linked list
+
+class Solution{
+  private:
+    Node* getmiddle(Node* head)
+    {
+        Node *slow = head;
+        Node *fast = head->next;
+        
+        while(fast != NULL && fast->next != NULL)
+        {
+            slow = slow->next;
+            fast = fast->next;
+            if(fast->next != NULL)
+                fast = fast->next;
+        }
+        return slow;
+    }
+    Node* halfreverse(Node *head)
+    {
+        Node *curr = head;
+        Node *prev = NULL;
+        Node *next = NULL;
+        
+        while(curr != NULL)
+        {
+            next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+  public:
+    //Function to check whether the list is palindrome.
+    bool isPalindrome(Node *head)
+    {
+        //Your code here
+        Node* middle = getmiddle(head);
+        Node* temp = middle->next;
+        middle->next = halfreverse(temp);
+        
+        Node *head1 = head;
+        Node *head2 = middle->next;
+        
+        while(head2 != NULL)
+        {
+            if(head1->data != head2->data)
+                return false;
+                
+            head1 = head1->next;
+            head2 = head2->next;
+        }
+        return true;
+    }
+};
+
+Add two number represented by linked list
+
+class Solution
+{
+    private:
+    Node* reverse(Node* head)
+    {
+        Node *curr = head;
+        Node *prev = NULL;
+        Node *next = NULL;
+        
+        while(curr != NULL)
+        {
+            next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+    void insertAtTail(struct Node* &head,struct Node* &tail,int val)
+    {
+        Node* sum = new Node(val);
+        if(head == NULL)
+        {
+            head = sum;
+            tail = sum;
+            return;
+        }else
+        {
+            tail->next = sum;
+            tail = sum;
+        }
+        
+        
+    }
+    struct Node* add(struct Node* first,struct Node* second)
+    {
+        int sum=0 , carry = 0;
+        Node* anshead = NULL;
+        Node* anstail = NULL;
+        while(first != NULL || second != NULL || carry)
+        {
+            sum = 0;
+            if(first != NULL)
+            {
+                sum += first->data;
+                first = first->next;
+            }
+            if(second != NULL)
+            {
+                sum += second->data;
+                second = second->next;
+            }
+            sum += carry;
+            carry = sum/10;
+            sum = sum%10;
+            insertAtTail(anshead,anstail,sum);
+        }
+        return anshead;
+    }
+    
+    public:
+    //Function to add two numbers represented by linked list.
+    struct Node* addTwoLists(struct Node* first, struct Node* second)
+    {
+        // code here
+        first = reverse(first);
+        second = reverse(second);
+        
+        Node *ans = add(first,second);
+        ans = reverse(ans);
+        
+        return ans;
+    }
+};
+
+clone a linked list
+
+class Solution
+{
+    private:
+    void insertAtTail(Node* &head, Node* &tail, int d)
+    {
+        Node* newnode = new Node(d);
+        if(head == NULL)
+        {
+            newnode->next = NULL;
+            head = newnode;
+            tail = newnode;
+        }
+        else{
+            tail->next = newnode;
+            tail = newnode;
+        }
+    }
+    public:
+    Node *copyList(Node *head)
+    {
+        //Write your code here
+        Node* clonehead = NULL;
+        Node* clonetail = NULL;
+        
+        Node* temp = head;
+        
+        while(temp != NULL)
+        {
+            insertAtTail(clonehead , clonetail , temp->data);
+            temp = temp->next;
+        }
+        
+        map<Node*,Node*> mapping;
+        Node* clonenode = clonehead;
+        Node* originalnode = head;
+        while(originalnode != NULL && clonenode != NULL)
+        {
+            mapping[originalnode] = clonenode;
+            originalnode = originalnode->next;
+            clonenode = clonenode->next;
+        }
+        
+        clonenode = clonehead;
+        originalnode = head;
+        while(originalnode != NULL)
+        {
+            clonenode->arb = mapping[originalnode->arb];
+            originalnode = originalnode->next;
+            clonenode = clonenode->next;
+        }
+        return clonehead;
+    }
+
+};
+
+clone a linked list approach 2
+
+class Solution
+{
+    private:
+    void insertAtTail(Node* &head, Node* &tail, int d)
+    {
+        Node* newnode = new Node(d);
+        if(head == NULL)
+        {
+            newnode->next = NULL;
+            head = newnode;
+            tail = newnode;
+        }
+        else{
+            tail->next = newnode;
+            tail = newnode;
+        }
+    }
+    public:
+    Node *copyList(Node *head)
+    {
+        //Write your code here
+        Node* clonehead = NULL;
+        Node* clonetail = NULL;
+        
+        Node* temp = head;
+        
+        while(temp != NULL)
+        {
+            insertAtTail(clonehead , clonetail , temp->data);
+            temp = temp->next;
+        }
+        
+        Node* clonenode = clonehead;
+        Node* originalnode = head;
+        while(originalnode != NULL && clonenode != NULL)
+        {
+            Node* next = originalnode->next;
+            originalnode->next = clonenode;
+            originalnode = next;
+            
+            next = clonenode->next;
+            clonenode->next = originalnode;
+            clonenode = next;
+        }
+        
+        temp = head;
+        while(temp != NULL)
+        {
+            if(temp->next != NULL)
+            {
+                    
+                temp->next->arb = temp->arb ? temp->arb->next : temp->arb;
+            }
+            temp = temp->next->next;
+        }
+        
+        clonenode = clonehead;
+        originalnode = head;
+        while(originalnode != NULL && clonenode != NULL)
+        {
+            originalnode->next = clonenode->next;
+            originalnode =originalnode->next;
+            if(originalnode != NULL)
+                clonenode->next = originalnode->next;
+            clonenode = clonenode->next;
+        }
+        return clonehead;
+    }
+
+};
+
+merge sort a linked list
+
+node* findmid(node* head)
+{
+    node* slow = head;
+    node* fast = head->next;
+    
+    while(fast != NULL && fast->next != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next;
+        if(fast->next != NULL)
+            fast = fast->next;
+    }
+    return slow;
+}
+node* merge(node* left, node* right)
+{
+    if(left == NULL)
+        return right;
+    if(right == NULL)
+        return left;
+    
+    node *ans = new node(-1);
+    node* temp = ans;
+    while(left != NULL && right != NULL)
+    {
+        if(left->data <= right->data)
+        {
+            temp->next = left;
+            temp = left;
+            left = left->next;
+        }else
+        {
+            temp->next = right;
+            temp = right;
+            right = right->next;
+        }   
+    }
+    while(left != NULL)
+    {
+        temp->next = left;
+        temp = left;
+        left = left->next;
+    }
+    while(right != NULL)
+    {
+        temp->next = right;
+        temp = right;
+        right = right->next;
+    }
+    return ans->next;
+}
+
+node* mergeSort(node *head) {
+    // Write your code here.
+    
+    if(head == NULL || head->next == NULL)
+        return head;
+    
+    node* mid = findmid(head);
+    
+    node* left = head;
+    node* right = mid->next;
+    mid->next = NULL;
+    
+    left = mergeSort(left);
+    right = mergeSort(right);
+    
+    node* answer = merge(left,right);
+    return answer;
+}
+
+Flatten a linked list
+
+Node* merge(Node* left,Node* right)
+{
+    if(left == NULL)
+        return right;
+    if(right == NULL)
+        return left;
+    
+    Node* ans = new Node(-1);
+    Node* temp = ans;
+    while(left != NULL && right != NULL)
+    {
+        if(left->data <= right->data)
+        {
+            temp->child = left;
+            temp = left;
+            left = left->child;
+        }
+        else
+        {
+            temp->child = right;
+            temp = right;
+            right = right->child;
+        }
+    }
+    while(left != NULL)
+    {
+        temp->child = left;
+        temp = left;
+        left = left->child;
+    }
+    while(right != NULL)
+    {
+        temp->child = right;
+        temp = right;
+        right = right->child;
+    }
+    temp->child = NULL;
+    return ans->child;
+}
+Node* flattenLinkedList(Node* head) 
+{
+	// Write your code here
+    if(head == NULL || head->next == NULL)
+        return head;
+    
+    Node *down = head;
+    Node* right = flattenLinkedList(head->next);
+    down->next = NULL;
+    
+    Node* ans = merge(down,right);
+    return ans;
+    
+}
+
+remove loop from a linked list
+
+
+Node *removeLoop(Node *head)
+{
+    // Write your code here.
+    if(head == NULL)
+        return head;
+    
+    Node* slow = head;
+    Node* fast = head;
+    while(fast != NULL && fast->next != NULL)
+    {
+        slow = slow->next;
+        fast = fast->next;
+        if(fast != NULL)
+        {
+            fast = fast->next;
+        }else{
+            return head;
+        }
+        if(fast == slow)
+            break;
+    }
+    if(head == fast)
+    {
+        slow = head;
+        while(fast->next != slow)
+            fast = fast->next;
+        fast->next = NULL;
+    }
+    if(fast != slow)
+        return head;
+    else
+    {
+        slow = head;
+        while(slow->next != fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        fast->next = NULL;
+    }
+    return head;  
+}
+
+remove duplicates from a sorted list
+
+Node *removeDuplicates(Node *head)
+{
+    Node* curr = head;
+    Node* next = head->next;
+    Node* dell;
+    
+    while(curr != NULL && next != NULL)
+    {
+        if(curr->data == next->data)
+        {
+            dell = next;
+            next = next->next;
+            curr->next = next;
+            delete dell;
+        }else{
+            curr = curr->next;
+            next = next->next;
+        }
+    }
+    return head;
+ 
+}
+
+Add 1 to a number represented as linked list
+
+Node* reverse(Node* head)
+    {
+        Node* curr = head;
+        Node* prev = NULL;
+        Node* next = NULL;
+        
+        while(curr != NULL)
+        {
+            next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+    Node* addOne(Node *head) 
+    {
+        
+        Node* temp;
+        Node* rev = reverse(head);
+        temp = rev;
+        int x;
+        temp->data += 1;
+        while((temp->data)/10 >= 1)
+        {
+            x = temp->data/10;
+            temp->data %= 10;
+            if(temp->next == NULL)
+            {
+                Node* newnode = new Node(x);
+                temp->next = newnode;
+                newnode->next = NULL;
+            }else{
+                temp = temp->next;
+                temp->data += x;
+            }
+        }
+    
+        return reverse(rev);
+    }
+
+Intersection of two sorted Linked lists
+
+void insertattail(Node* &head,Node* &tail,int d)
+{
+    Node* sum = new Node(d);
+    if(head == NULL)
+    {
+        head = sum;
+        tail = sum;
+        return;
+    }else{
+        tail->next = sum;
+        tail = sum;
+    }
+}
+
+Node* findIntersection(Node* head1, Node* head2)
+{
+    Node* temp1 = head1;
+    Node* temp2 = head2;
+    Node* anshead = NULL;
+    Node* anstail = NULL;
+    
+    while(temp1 != NULL && temp2 != NULL)
+    {
+        if(temp1->data == temp2->data){
+            insertattail(anshead,anstail,temp1->data);
+            temp1 = temp1->next;
+            temp2 = temp2->next;
+        }
+        if(temp1 == NULL || temp2 == NULL)
+            break;
+            
+        if(temp1->data > temp2->data)
+            temp2 = temp2->next;
+        else if(temp1->data < temp2->data)
+            temp1 = temp1->next;
+    }
+    
+    return anshead;
+}
+
+Intersection Point in Y Shapped Linked Lists
+
+int intersectPoint(Node* head1, Node* head2)
+{
+    Node* temp1 = head1;
+    Node* temp2 = head2;
+    
+    if(temp1 == NULL || temp2== NULL)
+    {
+        return -1;
+    }
+    
+    while(temp1 != temp2)
+    {
+        temp1 =temp1->next;
+        temp2 = temp2->next;
+        
+        if(temp1 == temp2)
+        {
+            return temp1->data;
+        }
+        
+        if(temp1 == NULL)
+        {
+            temp1 = head2;
+        }
+        if(temp2 == NULL)
+        {
+            temp2 = head1;
+        }
+    }
+    return -1;
+}
+
+Split a circular linked list into two halfes 
+
+Node* findMid(Node* head)
+{
+    Node* slow = head;
+    Node* fast = head->next;
+    Node* temp = head;
+    int count = 0;
+    do{
+        temp = temp->next;
+        count++;
+    }while(temp != head);
+    
+    if(count%2 != 0){
+        while(fast != head )
+        {
+            slow = slow->next;
+            fast = fast->next;
+            if(fast != head)
+                fast = fast->next;
+        }
+    }else{
+        while(fast != head && fast->next != head)
+        {
+            slow = slow->next;
+            fast = fast->next;
+            if(fast != head)
+                fast = fast->next;
+        }
+    }
+    return slow;
+}
+
+void splitList(Node *head, Node **head1_ref, Node **head2_ref)
+{
+    // your code goes here
+    Node* head1;
+    Node* head2;
+    if(head == NULL || head->next == NULL)
+        return;
+        
+    Node* temp ;
+    Node* mid = findMid(head);
+    head1 = head;
+    temp = head1;
+    head2 = mid->next;
+    while(temp != mid)
+    {
+        temp = temp->next;
+    }temp->next = head1;
+    
+    temp = head2;
+    while(temp->next != head)
+    {
+        temp = temp->next;
+    }temp->next = head2;
+    
+    
+    *head1_ref = head1;
+    *head2_ref = head2;
+}
+
+Reverse a circular linked list
+
+void reverse(struct Node** head_ref)
+{
+    Node* curr = *head_ref;
+    Node* prev = curr;
+    Node* next = NULL;
+    
+    while(prev->next != curr)
+    {
+        prev = prev->next;
+    }
+    
+    do{
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }while(curr != *head_ref);
+    
+     *head_ref = prev;
+}
+
+Reverse a doubly 
+
+Node* reverseDLL(Node * head)
+{
+    //Your code here
+    Node* curr = head;
+    Node* prev = NULL;
+    Node* next = NULL;
+    
+    while(curr != NULL)
+    {
+        next  = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr->prev = next;
+        curr = next;
+    }
+    return prev;
+}
+
+Find pair with a given sum in a doubly linked list
+
+bool findPair(Node* head, int k)
+{
+    Node* first = head;
+    Node* second = head;
+    while(second->next != NULL)
+    {
+        second = second->next;
+    }
+    while(first != second)
+    {
+        if(first->data + second->data > k)
+            second = second->prev;
+        else if(first->data + second->data < k)
+            first = first->next;
+        else if(first->data + second->data == k)
+            return true;
+    }
+    return false;
+}
+
+Count triplets in a sorted doubly linked list whose sum is equal to a given value x
+
+int countTrip(DLLNode* first,DLLNode* second, int val)
+{
+    int count = 0;
+    while(first && second && first != second && first != second->next)
+    {
+        if(first->data + second->data > val)
+            second = second->prev;
+        else if(first->data + second->data < val)
+            first = first ->next;
+        else if(first->data + second->data == val){
+            count++;
+            first = first->next;
+            second = second->prev;
+        }
+    }
+    return count;
+}
+int countTriplets(DLLNode* head, int x)
+{
+    DLLNode* first;
+    DLLNode* curr;
+    DLLNode* second = head;
+    int count = 0;
+    while(second->next != NULL){
+        second = second->next;
+    }
+    for(curr = head ; curr != NULL ; curr = curr->next)
+    {
+        first = curr->next;
+        count += countTrip(first,second,x-curr->data); 
+    }
+    return count;
+}  
+
+Rotate Doubly Linked Lists
+
+ Node *rotateDLL(Node *start,int p)
+    {
+        while(p)
+        {
+            Node* temp = start;
+            Node* store = temp;
+            while(temp->next)
+            {
+                temp = temp->next;;
+            }
+            start = start->next;
+            temp->next = store;
+            store->prev = temp;
+            temp = temp->next;
+            temp->next = NULL;
+            start->prev = NULL;
+            p--;
+        }
+        return start;
+    }
+
+Multiply two numbers represented by linked list
+
+#define mod 1000000007
+long long  multiplyTwoLists (Node* l1, Node* l2)
+{
+    long long n = 0;
+    long long m = 0;
+    while(l1)
+    {
+        n = ((n*10)%mod + (l1->data)%mod)%mod;
+        l1 = l1->next;
+    }
+    while(l2)
+    {
+        m = ((m*10)%mod + (l2->data)%mod)%mod;
+        l2  = l2->next;
+    }
+    return ((n%mod)*(m%mod))%mod;
+    
+}
+
+Deletes nodes having greater value on right
+
+Node* reverse(Node* head)
+    {
+        Node* curr = head;
+        Node* prev = NULL;
+        Node* next = NULL;
+        while(curr)
+        {
+            next = curr->next;
+            curr->next = prev;
+            prev  =curr;
+            curr= next;
+        }
+        return prev;
+    }
+    Node *compute(Node *head)
+    {
+        if(!head || !head->next)
+            return head;
+            
+        Node* nnode = new Node(-1);
+        Node* curr = reverse(head);
+        nnode->next = curr;
+        while(curr->next)
+        {
+            if(curr->data > curr->next->data)
+            {
+                curr->next = curr->next->next;
+            }else{
+                curr = curr->next;
+            }
+        }
+        return reverse(nnode->next);
+    }
+
+Segregate even and odd nodes in a linked list
+
+Node* divide(int N, Node *head)
+    {
+        Node* find = head;
+        Node* even = new Node(-1);
+        Node* odd = new Node(-1);
+        Node* oddhead = odd;
+        Node* evenhead = even;
+        while(find)
+        {
+            if(find->data % 2 == 0)
+            {
+                even->next = find;
+                even = even->next;
+            }
+            else
+            {
+                odd->next = find;
+                odd = odd->next;
+            }
+            find = find->next;
+        }
+        even->next = oddhead->next;
+        odd->next = NULL;
+        return evenhead->next;;
+    }
